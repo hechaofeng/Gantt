@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="../lib/jquery-ui-1.8.4.css" />
+	<!--<link rel="stylesheet" type="text/css" href="reset.css" />-->
+	<link rel="stylesheet" type="text/css" href="../jquery.ganttView.css" />
+	<style type="text/css">
+		*{margin:0;padding:0}
+		body {
+			font-family: tahoma, verdana, helvetica;
+			font-size: 14px;
+			padding: 10px;
+		}
+	</style>
+	<title>jQuery Gantt</title>
+	<script src="../../00_code/pmcc/pmcc-web/pmcc-web/src/main/webapp/top/workbench/base/js/MainFrame.js"></script>
+</head>
+<body>
+
+
+	<div id="ganttChart"></div>
+	<br/><br/>
+	<div id="eventMessage"></div>
+
+	<script type="text/javascript" src="../lib/jq.js"></script>
+	<script type="text/javascript" src="../lib/data.js"></script>
+	<script type="text/javascript" src="../lib/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../jquery.ganttView.js"></script>
+	<script type="text/javascript" src="data.js"></script>
+	<script type="text/javascript">
+
+		$(function () {
+		    //WEBGANTT
+		    //！！！！！注意除data: ganttDeNumData,为【必须】外，其他配置，根据自己的需求来；
+			$("#ganttChart").ganttView({
+				data: ganttDateData,//数据源、【必须】
+				fixTop:true,	//是否固定组件的高度 默认false;
+                bodyHeight:320,	//固定组件的高度，默认 320，（fixTop为false时，无效）；
+
+                /*左边表格的部分 【*/
+                leftGridItemsShowWord:[ //左边表格的【Items】部分可用的显示字段为：【‘showWord’（该列显示的字段）】、【‘text’（题头文字）】、【‘width’（列宽）】;显示顺序有先后;默认：[];
+                    {showWord:"date",text:"第一列",width:"30%"},
+                    {showWord:"name",text:"第二列"},
+                    {showWord:"title",text:"第三列",width:"20%"},
+				],//显示的每条item数据的需要显示的字段 顺序有用的
+                leftGridSeriesShowWord:[ //左边表格的【Series】部分可用的显示字段为：【‘showWord’（该列显示的字段）】、【‘text’（题头文字）】、【‘width’（列宽）】;显示顺序有先后;默认：[];
+                    {showWord:"value",text:"第四列"},
+                    {showWord:"name",text:"第五列"},
+                    {showWord:"title",text:"第六列"},
+				],//显示的每条series数据的需要显示的字段 顺序有用的
+                gridTitleNameCss:{},			//左边表格 题头的css; 默认{}
+                gridCss:{textAlign:"center"},	//左边表格 整体的css; 默认{}
+                gridItemCss:{},					//左边表格Item数据部分的css; 默认{}
+                gridSeriesCss:{},				//左边表格Series数据部分的css; 默认{}
+                /*左边表格的部分 】*/
+
+
+                /*右侧甘特图的部分 【*/
+                slideWidth:"60%",		//甘特图的部分显示宽度 支持百分比和数字，默认：“100%”
+                tilteName:"甘特图",		//甘特图组件的  标题，默认：“甘特图”
+                titleNameSize:14,		//甘特图组件的  标题字号，默认：14
+                titleHeight:0,			//甘特图组件的  标题高度（此处为0，代表隐藏了），默认：40
+                ganttTitleCss:{"text-align":"left",'padding-left':"10px"},//右边gantt图的部分 标题的css
+                headerData:(function(){	//右侧 题头部分的（第一行） 数据，默认：[];
+                    var hours_quarters = 24*4;
+                    var arr =[];
+                    for(var i =hours_quarters;i>0;i--){
+                        arr.push(Math.floor(i/4)+"时"+i%4*15+"分")
+                    }
+                    return arr;
+                })(),
+                headerSumData:(function(){//右侧 题头部分的（第二行） 数据，默认：[];
+                    var hours_quarters = 24;
+                    var arr =[];
+                    for(var i =0;i<hours_quarters;i++){
+                        arr.push(i*4+" 至 "+ (i+1)*4);
+                    }
+                    return arr;
+                })(),
+                headerHeight: 0,		//右侧 题头部分的（第一行）的高度，默认：34
+                headerSumHeight: 40,	//右侧 题头部分的（第二行）的高度，默认：24
+                dateModel:true,			//甘特图的数据类型：true即为时间，false为非时间（数字）;默认：true
+                minGap:15*60*1000,		//和dateModel 一起使用，最小间隔，默认：15*60*1000
+										// 如果dateModel为true， 表示数据的起始值为时间， minGap必须为以“毫秒为单位的值”；
+										// 如果dateModel为false，表示非时间数据，那么此值即为最小间隔；
+                cellWidth: 40,			//甘特图单元格的 宽度
+                gridcellHeight: 32,		//甘特图单元格的宽度
+                ganttGridCellsCss:{},	//右边gantt图的部分 背景格子部分的css，
+				/*右侧甘特图的部分 】*/
+
+
+                /*右侧甘特图--滑块部分 配置项 【*/
+                blockTitle:"停电时长",				//定义滑块的 标题，默认："停电时长"；
+                disabledColor:"#d0d0d0",			//定义滑块的默认禁用事件的背景色，默认："#d0d0d0"；
+                blockBgColor:"#e4c846",				//甘特图滑块的 默认背景色，默认："#e4c846"；
+                animate:false,						//拖拽 改变滑块的尺寸的 动画，默认：false；
+                ghost:false,						//拖拽 改变滑块的尺寸的 视觉反馈，默认：false；
+                blockHeight:20,						//甘特图滑块的 高度，默认：20；
+                blockTextColor:"#000",				//滑块内的 字体的颜色，默认："#aaa"；
+                slideMinWidth:300,					//甘特图的最小显示宽度，默认：300；
+                overText:"数据超出",					//甘特图的滑块超出右侧边界时，滑块内给的提示，默认："数据超出"；
+                blockTitleCallback:function(data){	//自定义滑块的 title 会覆盖 blockTitle 的配置，无默认
+                    var title = data.start.toTimeString().split(' ')[0]+" 至 "+data.end.toTimeString().split(' ')[0] +"，停电时长 ";
+                    console.log(data)
+                    return "我是回调的title!"+title;
+                },
+                setBlockText:function(size){		//自定义滑块内的文字，无默认
+                    return "我是滑块，我的总长度为："+size
+				},
+                onContextmenuText:"我是右键",		//滑块右键菜单 弹出层的文字，默认："我是右键"
+                contextmenuCss:{"color":"#fff"},	//滑块右键菜单 弹出层的样式，无默认
+                behavior: {							//定义滑块的行为：“左键点击”、“拖拽”、“改变宽度”、“右键点击”
+                    clickable: true,				//滑块 可“左键点击” ，默认：false;
+                    draggable: true,				//滑块 可“拖拽”，默认：false;
+                    resizable: true,				//滑块 可“改变宽度”，默认：false;
+                    contextMenuable:true,			//滑块 可“右键点击”，默认：false;
+                    //滑块事件的回调
+                    onClick: function (data,div) {	//滑块 “左键点击” 回调处理的方法;
+                        div.css('backgroundColor',"yellow");
+                        console.log(data,div);
+                        $("#eventMessage").text("左键点击了");
+                    },
+                    onResize: function (data,div) {	//滑块 “改变宽度” 回调处理的方法;
+                        div.css('backgroundColor',"blue");
+                        var msg = "You resized "+ data.blockName+" an event: { start: " + data.start.toTimeString().split(' ')[0]+ ", end: " + data.end.toTimeString().split(' ')[0] + " }";
+                        $("#eventMessage").text(msg);
+                    },
+                    onDrag: function (data,div) {	//滑块 “拖拽” 回调处理的方法;
+                        div.css('backgroundColor',"white");
+                        var msg = "You dragged "+ data.blockName+" an event: { start: " + data.start.toTimeString().split(' ')[0]+ ", end: " + data.end.toTimeString().split(' ')[0] + " }";
+                        $("#eventMessage").text(msg);
+                    },
+                    onContextmenu:function(data,div){//滑块 “右键点击” 回调处理的方法;
+                        div.css('backgroundColor',"red");
+                        console.log(data);
+                        $("#eventMessage").text("点击了右键");
+                    }
+                }
+                /*滑块部分 配置项 】*/
+			});
+
+		});
+	</script>
+
+</body>
+</html>
