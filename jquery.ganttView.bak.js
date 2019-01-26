@@ -1,7 +1,6 @@
 /*
-jQuery.ganttView v.0.8.8
-Copyright (c) 2010 JC Grubbs - jc.grubbs@devmynd.com
-MIT License Applies
+jQuery.ganttView 
+@author hechaofeng/602527818@qq.comn
 */
 
 (function (jQuery) {
